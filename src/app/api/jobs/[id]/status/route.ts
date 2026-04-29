@@ -50,8 +50,16 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     include: { customer: { select: { id: true, name: true } }, items: true },
   });
 
-  // Trigger invoice generation on completion (Sprint 4)
-  // if (status === JobStatus.COMPLETED) { await generateAndSendInvoice(id); }
+  // Auto-generate and send invoice on job completion
+  if (status === JobStatus.COMPLETED) {
+    try {
+      const { generateAndSendInvoice } = await import("@/lib/automation");
+      await generateAndSendInvoice(id);
+    } catch (err) {
+      console.error("[status] automation failed:", err);
+      // Non-blocking — job is still marked completed
+    }
+  }
 
   return NextResponse.json(updated);
 }
