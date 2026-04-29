@@ -1,0 +1,188 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id           String    @id @default(cuid())
+  email        String    @unique
+  emailVerified DateTime?
+  passwordHash String?
+  name         String?
+  // Firemní údaje
+  companyName  String?
+  ico          String?
+  dic          String?
+  street       String?
+  city         String?
+  zip          String?
+  // Platební údaje
+  bankAccount  String?
+  bankName     String?
+  // Subscription
+  plan         Plan      @default(STARTER)
+  planExpiresAt DateTime?
+  // Relations
+  customers    Customer[]
+  jobs         Job[]
+  invoices     Invoice[]
+  accounts     Account[]
+  sessions     Session[]
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+}
+
+enum Plan {
+  STARTER
+  BUSINESS
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model Customer {
+  id        String    @id @default(cuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id])
+  name      String
+  email     String?
+  phone     String?
+  street    String?
+  city      String?
+  zip       String?
+  ico       String?
+  dic       String?
+  notes     String?
+  jobs      Job[]
+  invoices  Invoice[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model Job {
+  id            String     @id @default(cuid())
+  userId        String
+  user          User       @relation(fields: [userId], references: [id])
+  customerId    String
+  customer      Customer   @relation(fields: [customerId], references: [id])
+  title         String
+  description   String?
+  status        JobStatus  @default(DRAFT)
+  scheduledDate DateTime?
+  completedAt   DateTime?
+  items         JobItem[]
+  photos        JobPhoto[]
+  invoice       Invoice?
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+}
+
+enum JobStatus {
+  DRAFT
+  SCHEDULED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+model JobItem {
+  id          String  @id @default(cuid())
+  jobId       String
+  job         Job     @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  description String
+  quantity    Decimal @db.Decimal(10, 2)
+  unit        String  @default("ks")
+  unitPrice   Decimal @db.Decimal(10, 2)
+  vatRate     Int     @default(21)
+}
+
+model JobPhoto {
+  id        String   @id @default(cuid())
+  jobId     String
+  job       Job      @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  url       String
+  createdAt DateTime @default(now())
+}
+
+model Invoice {
+  id            String        @id @default(cuid())
+  userId        String
+  user          User          @relation(fields: [userId], references: [id])
+  customerId    String
+  customer      Customer      @relation(fields: [customerId], references: [id])
+  jobId         String?       @unique
+  job           Job?          @relation(fields: [jobId], references: [id])
+  invoiceNumber String
+  status        InvoiceStatus @default(DRAFT)
+  issueDate     DateTime      @default(now())
+  dueDate       DateTime
+  totalExclVat  Int
+  vatAmount     Int
+  totalInclVat  Int
+  currency      String        @default("CZK")
+  sentAt        DateTime?
+  paidAt        DateTime?
+  pdfUrl        String?
+  items         InvoiceItem[]
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  @@unique([userId, invoiceNumber])
+}
+
+enum InvoiceStatus {
+  DRAFT
+  SENT
+  PAID
+  OVERDUE
+  CANCELLED
+}
+
+model InvoiceItem {
+  id           String  @id @default(cuid())
+  invoiceId    String
+  invoice      Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  description  String
+  quantity     Decimal @db.Decimal(10, 2)
+  unit         String
+  unitPrice    Int
+  vatRate      Int
+  totalExclVat Int
+  vatAmount    Int
+  totalInclVat Int
+}
