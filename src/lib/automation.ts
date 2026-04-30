@@ -80,9 +80,9 @@ export async function generateAndSendInvoice(jobId: string): Promise<void> {
         }
       }
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      // @ts-expect-error react-pdf expects DocumentProps but FunctionComponentElement is compatible at runtime
       const pdfBuffer = await renderToBuffer(
-        createElement(InvoiceDocument, { data: invoiceData, qrString }) as any,
+        createElement(InvoiceDocument, { data: invoiceData, qrString }),
       );
 
       const key = `invoices/${job.userId}/${invoice.id}.pdf`;
