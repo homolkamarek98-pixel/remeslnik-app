@@ -2,8 +2,8 @@ import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { formatCzk } from "@/lib/utils";
+import { buttonVariants } from "@/components/ui/button";
+import { cn, formatCzk } from "@/lib/utils";
 
 export default async function CustomerDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const session = await auth();
@@ -41,9 +41,12 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
         <div className="bg-white rounded-lg border border-gray-200 p-4">
           <div className="flex items-center justify-between mb-3">
             <h2 className="font-semibold">Zakázky</h2>
-            <Button asChild size="sm" variant="outline">
-              <Link href={`/jobs/new?customerId=${customer.id}`}>+ Nová zakázka</Link>
-            </Button>
+            <Link
+              href={`/jobs/new?customerId=${customer.id}`}
+              className={cn(buttonVariants({ variant: "outline", size: "sm" }))}
+            >
+              + Nová zakázka
+            </Link>
           </div>
           {customer.jobs.length === 0 ? (
             <p className="text-sm text-gray-500">Žádné zakázky.</p>

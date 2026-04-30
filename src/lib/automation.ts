@@ -80,8 +80,9 @@ export async function generateAndSendInvoice(jobId: string): Promise<void> {
         }
       }
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const pdfBuffer = await renderToBuffer(
-        createElement(InvoiceDocument, { data: invoiceData, qrString }),
+        createElement(InvoiceDocument, { data: invoiceData, qrString }) as any,
       );
 
       const key = `invoices/${job.userId}/${invoice.id}.pdf`;

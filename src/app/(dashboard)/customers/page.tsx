@@ -1,7 +1,8 @@
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 export const metadata = { title: "Zákazníci — Řemeslník.app" };
 
@@ -17,17 +18,17 @@ export default async function CustomersPage() {
     <div>
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold">Zákazníci</h1>
-        <Button asChild>
-          <Link href="/customers/new">+ Přidat zákazníka</Link>
-        </Button>
+        <Link href="/customers/new" className={cn(buttonVariants())}>
+          + Přidat zákazníka
+        </Link>
       </div>
 
       {customers.length === 0 ? (
         <div className="text-center py-16 text-gray-500">
           <p className="mb-4">Zatím žádní zákazníci.</p>
-          <Button asChild variant="outline">
-            <Link href="/customers/new">Přidat prvního zákazníka</Link>
-          </Button>
+          <Link href="/customers/new" className={cn(buttonVariants({ variant: "outline" }))}>
+            Přidat prvního zákazníka
+          </Link>
         </div>
       ) : (
         <div className="divide-y divide-gray-200 bg-white rounded-lg border border-gray-200">
