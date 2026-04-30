@@ -80,10 +80,9 @@ export async function generateAndSendInvoice(jobId: string): Promise<void> {
         }
       }
 
-      // @ts-expect-error react-pdf expects DocumentProps but FunctionComponentElement is compatible at runtime
-      const pdfBuffer = await renderToBuffer(
-        createElement(InvoiceDocument, { data: invoiceData, qrString }),
-      );
+      const element = createElement(InvoiceDocument, { data: invoiceData, qrString });
+      // @ts-expect-error react-pdf FunctionComponentElement is compatible with ReactElement<DocumentProps>
+      const pdfBuffer = await renderToBuffer(element);
 
       const key = `invoices/${job.userId}/${invoice.id}.pdf`;
       const pdfUrl = await uploadToR2(key, pdfBuffer, "application/pdf");
