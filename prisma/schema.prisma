@@ -136,6 +136,7 @@ model JobPhoto {
   jobId     String
   job       Job      @relation(fields: [jobId], references: [id], onDelete: Cascade)
   url       String
+  key       String   @default("")
   createdAt DateTime @default(now())
 }
 
@@ -158,6 +159,7 @@ model Invoice {
   sentAt        DateTime?
   paidAt        DateTime?
   pdfUrl        String?
+  pdfKey        String?
   items         InvoiceItem[]
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt

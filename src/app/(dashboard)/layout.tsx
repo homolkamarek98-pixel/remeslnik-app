@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { logout } from "@/app/actions/auth";
 import { Button } from "@/components/ui/button";
+import { BottomNav } from "@/components/layout/BottomNav";
 
 export default async function DashboardLayout({
   children,
@@ -22,12 +23,11 @@ export default async function DashboardLayout({
                 Řemeslník.app
               </Link>
               <nav className="hidden sm:flex items-center gap-6 text-sm text-gray-600">
-                <Link href="/dashboard" className="hover:text-gray-900">
-                  Přehled
-                </Link>
-                <Link href="/profile" className="hover:text-gray-900">
-                  Profil
-                </Link>
+                <Link href="/dashboard" className="hover:text-gray-900">Přehled</Link>
+                <Link href="/jobs" className="hover:text-gray-900">Zakázky</Link>
+                <Link href="/customers" className="hover:text-gray-900">Zákazníci</Link>
+                <Link href="/invoices" className="hover:text-gray-900">Faktury</Link>
+                <Link href="/profile" className="hover:text-gray-900">Profil</Link>
               </nav>
             </div>
             <div className="flex items-center gap-4">
@@ -48,9 +48,10 @@ export default async function DashboardLayout({
           </div>
         </div>
       </header>
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-20 sm:pb-8">
         {children}
       </main>
+      <BottomNav />
     </div>
   );
 }
