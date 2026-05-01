@@ -45,7 +45,7 @@ export function ProfileForm({ user }: { user: UserProfile | null }) {
               disabled={pending}
             />
             {state.errors?.name && (
-              <p className="text-sm text-red-600">{state.errors.name[0]}</p>
+              <p className="text-sm text-destructive">{state.errors.name[0]}</p>
             )}
           </div>
 
@@ -60,7 +60,7 @@ export function ProfileForm({ user }: { user: UserProfile | null }) {
               disabled={pending}
             />
             {state.errors?.companyName && (
-              <p className="text-sm text-red-600">
+              <p className="text-sm text-destructive">
                 {state.errors.companyName[0]}
               </p>
             )}
@@ -88,7 +88,7 @@ export function ProfileForm({ user }: { user: UserProfile | null }) {
                 disabled={pending}
               />
               {state.errors?.ico && (
-                <p className="text-sm text-red-600">{state.errors.ico[0]}</p>
+                <p className="text-sm text-destructive">{state.errors.ico[0]}</p>
               )}
             </div>
             <div className="space-y-2">
@@ -106,7 +106,7 @@ export function ProfileForm({ user }: { user: UserProfile | null }) {
                 disabled={pending}
               />
               {state.errors?.dic && (
-                <p className="text-sm text-red-600">{state.errors.dic[0]}</p>
+                <p className="text-sm text-destructive">{state.errors.dic[0]}</p>
               )}
             </div>
           </div>
@@ -150,7 +150,7 @@ export function ProfileForm({ user }: { user: UserProfile | null }) {
                 disabled={pending}
               />
               {state.errors?.zip && (
-                <p className="text-sm text-red-600">{state.errors.zip[0]}</p>
+                <p className="text-sm text-destructive">{state.errors.zip[0]}</p>
               )}
             </div>
           </div>
@@ -189,12 +189,12 @@ export function ProfileForm({ user }: { user: UserProfile | null }) {
       </Card>
 
       {state.success && (
-        <p className="text-sm text-green-600 font-medium">
+        <p className="text-sm text-success font-medium">
           ✓ Profil byl úspěšně uložen
         </p>
       )}
       {state.message && (
-        <p className="text-sm text-red-600">{state.message}</p>
+        <p className="text-sm text-destructive">{state.message}</p>
       )}
 
       <Button type="submit" disabled={pending} className="w-full sm:w-auto">

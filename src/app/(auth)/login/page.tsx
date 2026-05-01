@@ -51,7 +51,7 @@ export default function LoginPage() {
           </div>
 
           {state.message && (
-            <p className="text-sm text-red-600">{state.message}</p>
+            <p className="text-sm text-destructive">{state.message}</p>
           )}
 
           <Button type="submit" className="w-full" disabled={pending}>
@@ -61,7 +61,7 @@ export default function LoginPage() {
 
         <p className="mt-4 text-center text-sm text-gray-600">
           Nemáte účet?{" "}
-          <Link href="/register" className="text-blue-600 hover:underline">
+          <Link href="/register" className="text-primary hover:underline font-medium">
             Zaregistrovat se zdarma
           </Link>
         </p>

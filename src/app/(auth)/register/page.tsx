@@ -37,7 +37,7 @@ export default function RegisterPage() {
               disabled={pending}
             />
             {state.errors?.name && (
-              <p className="text-sm text-red-600">{state.errors.name[0]}</p>
+              <p className="text-sm text-destructive">{state.errors.name[0]}</p>
             )}
           </div>
 
@@ -52,7 +52,7 @@ export default function RegisterPage() {
               disabled={pending}
             />
             {state.errors?.email && (
-              <p className="text-sm text-red-600">{state.errors.email[0]}</p>
+              <p className="text-sm text-destructive">{state.errors.email[0]}</p>
             )}
           </div>
 
@@ -67,14 +67,14 @@ export default function RegisterPage() {
               disabled={pending}
             />
             {state.errors?.password && (
-              <p className="text-sm text-red-600">
+              <p className="text-sm text-destructive">
                 {state.errors.password[0]}
               </p>
             )}
           </div>
 
           {state.message && (
-            <p className="text-sm text-red-600">{state.message}</p>
+            <p className="text-sm text-destructive">{state.message}</p>
           )}
 
           <Button type="submit" className="w-full" disabled={pending}>
@@ -84,7 +84,7 @@ export default function RegisterPage() {
 
         <p className="mt-4 text-center text-sm text-gray-600">
           Již máte účet?{" "}
-          <Link href="/login" className="text-blue-600 hover:underline">
+          <Link href="/login" className="text-primary hover:underline font-medium">
             Přihlásit se
           </Link>
         </p>
