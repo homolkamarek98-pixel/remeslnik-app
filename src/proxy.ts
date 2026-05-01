@@ -3,13 +3,16 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 const publicRoutes = ["/login", "/register", "/"];
+const publicPrefixes = ["/poptavka", "/remeslnik", "/remeslnici"];
 const authRoutes = ["/login", "/register"];
 
 export async function proxy(req: NextRequest) {
   const session = await auth();
   const { pathname } = req.nextUrl;
   const isLoggedIn = !!session?.user;
-  const isPublicRoute = publicRoutes.includes(pathname);
+  const isPublicRoute =
+    publicRoutes.includes(pathname) ||
+    publicPrefixes.some((prefix) => pathname.startsWith(prefix));
   const isAuthRoute = authRoutes.includes(pathname);
 
   if (isAuthRoute && isLoggedIn) {
