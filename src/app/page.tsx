@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowRight, Star, CheckCircle, Zap, Wrench, Paintbrush, Layers, Settings } from "lucide-react";
+import { ArrowRight, Star, CheckCircle, Zap, Wrench, Paintbrush, Layers, Settings, Users, TrendingUp, Clock } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Řemeslník.app — Prověření řemeslníci v Praze do 24 hodin",
@@ -83,7 +83,7 @@ export default function LandingPage() {
                 <a href="#recenze" className="hover:text-navy-700 transition-colors">
                   Recenze
                 </a>
-                <Link href="/login" className="hover:text-navy-700 transition-colors">
+                <Link href="/pro-remeslniky" className="hover:text-navy-700 transition-colors">
                   Pro řemeslníky
                 </Link>
               </nav>
@@ -313,6 +313,63 @@ export default function LandingPage() {
           </div>
         </section>
 
+        {/* Pro řemeslníky */}
+        <section className="bg-white py-12 sm:py-16 border-t border-gray-100">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="grid lg:grid-cols-2 gap-12 items-center">
+              <div>
+                <p className="text-xs font-semibold tracking-widest uppercase text-mkp-amber-600 mb-4">
+                  Pro řemeslníky
+                </p>
+                <h2 className="text-2xl sm:text-3xl font-bold text-navy-900 mb-4">
+                  Získejte nové zákazníky bez reklamy
+                </h2>
+                <p className="text-gray-600 leading-relaxed mb-6">
+                  Jste elektrikář, instalatér nebo malíř v Praze? Přihlaste se
+                  a my vám budeme posílat poptávky přesně z vašeho oboru a
+                  lokality. Žádná provize, žádná skrytá poplatek.
+                </p>
+                <Link
+                  href="/pro-remeslniky"
+                  className="inline-flex items-center gap-2 bg-navy-500 text-white font-semibold text-base rounded-lg px-7 py-4 hover:bg-navy-700 transition-colors shadow-md"
+                >
+                  Přihlásit se jako řemeslník
+                  <ArrowRight className="size-5" />
+                </Link>
+              </div>
+              <div className="grid grid-cols-1 gap-4">
+                {[
+                  {
+                    icon: Clock,
+                    title: "Poptávky do 24 hodin",
+                    desc: "Zákazník čeká na odpověď. Budete první.",
+                  },
+                  {
+                    icon: Users,
+                    title: "Prověření zákazníci",
+                    desc: "Každá poptávka obsahuje popis práce a kontakt.",
+                  },
+                  {
+                    icon: TrendingUp,
+                    title: "Zdarma na start",
+                    desc: "Registrace nic nestojí. Platba za výsledek teprve zvažujeme.",
+                  },
+                ].map(({ icon: Icon, title, desc }) => (
+                  <div key={title} className="flex items-start gap-4 bg-gray-50 rounded-xl p-4">
+                    <div className="w-10 h-10 rounded-lg bg-navy-100 flex items-center justify-center shrink-0">
+                      <Icon className="size-5 text-navy-500" />
+                    </div>
+                    <div>
+                      <p className="font-semibold text-gray-900 text-sm mb-0.5">{title}</p>
+                      <p className="text-gray-500 text-xs leading-relaxed">{desc}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
+
         {/* Bottom CTA */}
         <section className="bg-navy-700 py-16 sm:py-20">
           <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
@@ -372,7 +429,7 @@ export default function LandingPage() {
                   <li>📧 info@remeslnik.app</li>
                   <li>📞 773 XXX XXX</li>
                   <li>
-                    <Link href="/login" className="hover:text-white transition-colors">
+                    <Link href="/pro-remeslniky" className="hover:text-white transition-colors">
                       Pro řemeslníky →
                     </Link>
                   </li>
