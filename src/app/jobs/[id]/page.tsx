@@ -48,10 +48,10 @@ export default async function JobDetailPage({ params }: { params: Promise<{ id: 
   if (!job) notFound();
 
   const totalExclVat = job.items.reduce((sum, item) => {
-    return sum + Number(item.quantity) * item.unitPrice;
+    return sum + Number(item.quantity) * Number(item.unitPrice);
   }, 0);
   const totalVat = job.items.reduce((sum, item) => {
-    const base = Number(item.quantity) * item.unitPrice;
+    const base = Number(item.quantity) * Number(item.unitPrice);
     return sum + calcVat(base, item.vatRate);
   }, 0);
   const totalInclVat = totalExclVat + totalVat;
@@ -88,7 +88,7 @@ export default async function JobDetailPage({ params }: { params: Promise<{ id: 
           <h2 className="font-semibold mb-2">Položky</h2>
           <div className="border rounded-xl overflow-hidden">
             {job.items.map((item, idx) => {
-              const base = Number(item.quantity) * item.unitPrice;
+              const base = Number(item.quantity) * Number(item.unitPrice);
               const vat = calcVat(base, item.vatRate);
               return (
                 <div

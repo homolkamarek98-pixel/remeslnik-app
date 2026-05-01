@@ -6,12 +6,13 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 /** Převede haléře na Kč string: 12345 → "123,45 Kč" */
-export function formatCzk(halers: number): string {
+export function formatCzk(halers: number | { toNumber(): number }): string {
+  const n = typeof halers === "number" ? halers : halers.toNumber();
   return new Intl.NumberFormat("cs-CZ", {
     style: "currency",
     currency: "CZK",
     minimumFractionDigits: 2,
-  }).format(halers / 100);
+  }).format(n / 100);
 }
 
 /** Spočítá DPH z ceny bez DPH v haléřích */
@@ -32,11 +33,12 @@ export function buildQrPaymentString({
   message,
 }: {
   iban: string;
-  amount: number; // haléře
+  amount: number | { toNumber(): number }; // haléře
   variableSymbol: string;
   message?: string;
 }): string {
-  const amountCzk = (amount / 100).toFixed(2);
+  const amountNum = typeof amount === "number" ? amount : amount.toNumber();
+  const amountCzk = (amountNum / 100).toFixed(2);
   let qr = `SPD*1.0*ACC:${iban}*AM:${amountCzk}*CC:CZK*VS:${variableSymbol}`;
   if (message) qr += `*MSG:${message.slice(0, 60)}`;
   return qr;

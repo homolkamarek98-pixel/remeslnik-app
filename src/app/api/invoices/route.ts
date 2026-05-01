@@ -86,7 +86,9 @@ export async function POST(req: NextRequest) {
     const { InvoiceDocument } = await import("@/components/pdf/InvoiceDocument");
     const { createElement } = await import("react");
 
-    const pdfBuffer = await renderToBuffer(createElement(InvoiceDocument, { data: invoiceData }));
+    const element = createElement(InvoiceDocument, { data: invoiceData });
+    // @ts-expect-error react-pdf FunctionComponentElement is compatible with ReactElement<DocumentProps>
+    const pdfBuffer = await renderToBuffer(element);
     pdfKey = `invoices/${session.user.id}/${invoiceNumber}.pdf`;
     pdfUrl = await uploadToR2(pdfKey, pdfBuffer, "application/pdf");
   } catch (err) {

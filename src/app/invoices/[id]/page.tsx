@@ -42,7 +42,7 @@ export default async function InvoiceDetailPage({
 
   const qrString =
     user?.bankAccount &&
-    [InvoiceStatus.SENT, InvoiceStatus.OVERDUE].includes(invoice.status)
+    ([InvoiceStatus.SENT, InvoiceStatus.OVERDUE] as InvoiceStatus[]).includes(invoice.status)
       ? buildQrPaymentString({
           iban: user.bankAccount,
           amount: invoice.totalInclVat,
@@ -51,7 +51,7 @@ export default async function InvoiceDetailPage({
         })
       : null;
 
-  const canMarkPaid = [InvoiceStatus.SENT, InvoiceStatus.OVERDUE].includes(invoice.status);
+  const canMarkPaid = ([InvoiceStatus.SENT, InvoiceStatus.OVERDUE] as InvoiceStatus[]).includes(invoice.status);
 
   return (
     <div className="min-h-screen bg-gray-50 pb-24">

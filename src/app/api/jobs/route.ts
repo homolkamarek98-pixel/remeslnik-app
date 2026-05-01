@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
-import { JobStatus } from "@prisma/client";
+import { JobStatus, Prisma } from "@prisma/client";
 
 const jobSchema = z.object({
   customerId: z.string().cuid(),
@@ -37,7 +37,7 @@ export async function GET(req: NextRequest) {
   const nextWeek = new Date(today);
   nextWeek.setDate(nextWeek.getDate() + 7);
 
-  const where: Parameters<typeof prisma.job.findMany>[0]["where"] = {
+  const where: Prisma.JobWhereInput = {
     userId: session.user.id,
   };
 

@@ -41,7 +41,9 @@ export async function generateAndSendInvoice(jobId: string): Promise<string | nu
     const { InvoiceDocument } = await import("@/components/pdf/InvoiceDocument");
     const { createElement } = await import("react");
 
-    pdfBuffer = await renderToBuffer(createElement(InvoiceDocument, { data: invoiceData }));
+    const element = createElement(InvoiceDocument, { data: invoiceData });
+    // @ts-expect-error react-pdf FunctionComponentElement is compatible with ReactElement<DocumentProps>
+    pdfBuffer = await renderToBuffer(element);
     pdfKey = `invoices/${job.userId}/${invoiceNumber}.pdf`;
     pdfUrl = await uploadToR2(pdfKey, pdfBuffer, "application/pdf");
   } catch (err) {

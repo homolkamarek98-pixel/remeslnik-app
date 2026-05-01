@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
+import { Suspense } from "react";
 
 const errors: Record<string, string> = {
   Configuration: "Chyba konfigurace serveru.",
@@ -10,7 +11,7 @@ const errors: Record<string, string> = {
   Default: "Nastala chyba při přihlášení.",
 };
 
-export default function AuthErrorPage() {
+function AuthErrorContent() {
   const searchParams = useSearchParams();
   const errorCode = searchParams.get("error") ?? "Default";
   const message = errors[errorCode] ?? errors.Default;
@@ -28,5 +29,13 @@ export default function AuthErrorPage() {
         </Link>
       </div>
     </div>
+  );
+}
+
+export default function AuthErrorPage() {
+  return (
+    <Suspense>
+      <AuthErrorContent />
+    </Suspense>
   );
 }

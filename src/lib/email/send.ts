@@ -1,7 +1,10 @@
 import { Resend } from "resend";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
 const FROM = process.env.RESEND_FROM ?? "Řemeslník.app <faktury@remeslnik.app>";
+
+function getResend() {
+  return new Resend(process.env.RESEND_API_KEY!);
+}
 
 export interface SendInvoiceEmailParams {
   to: string;
@@ -23,7 +26,7 @@ export async function sendInvoiceEmail({
       ? [{ filename: pdfFilename, content: pdfBuffer }]
       : [];
 
-  return resend.emails.send({
+  return getResend().emails.send({
     from: FROM,
     to,
     subject: `Faktura č. ${invoiceNumber}`,
@@ -41,7 +44,7 @@ export async function sendOverdueReminderEmail({
   invoiceNumber: string;
   htmlBody: string;
 }) {
-  return resend.emails.send({
+  return getResend().emails.send({
     from: FROM,
     to,
     subject: `Upomínka — Faktura č. ${invoiceNumber} je po splatnosti`,

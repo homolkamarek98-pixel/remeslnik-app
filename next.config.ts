@@ -10,9 +10,7 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-  experimental: {
-    typedRoutes: true,
-  },
+  experimental: {},
 };
 
 export default withSentryConfig(nextConfig, {
@@ -21,7 +19,5 @@ export default withSentryConfig(nextConfig, {
   silent: !process.env.CI,
   widenClientFileUpload: true,
   tunnelRoute: "/monitoring",
-  hideSourceMaps: true,
-  disableLogger: true,
-  automaticVercelMonitors: true,
+  sourcemaps: { disable: true },
 });

@@ -2,7 +2,7 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { JobStatus } from "@prisma/client";
+import { JobStatus, Prisma } from "@prisma/client";
 import { BriefcaseIcon } from "lucide-react";
 
 export const metadata = { title: "Zakázky" };
@@ -40,7 +40,7 @@ export default async function JobsPage({
   const nextWeek = new Date(today);
   nextWeek.setDate(nextWeek.getDate() + 7);
 
-  const where: Parameters<typeof prisma.job.findMany>[0]["where"] = {
+  const where: Prisma.JobWhereInput = {
     userId: session.user.id,
   };
 

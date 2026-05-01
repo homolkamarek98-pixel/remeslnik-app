@@ -11,7 +11,7 @@ export async function POST(_req: NextRequest, { params }: { params: Promise<{ id
   const invoice = await prisma.invoice.findFirst({ where: { id, userId: session.user.id } });
   if (!invoice) return NextResponse.json({ error: "Nenalezeno" }, { status: 404 });
 
-  if (![InvoiceStatus.SENT, InvoiceStatus.OVERDUE].includes(invoice.status)) {
+  if (!([InvoiceStatus.SENT, InvoiceStatus.OVERDUE] as InvoiceStatus[]).includes(invoice.status)) {
     return NextResponse.json(
       { error: "Fakturu lze označit jako zaplacenou pouze ve stavu SENT nebo OVERDUE" },
       { status: 422 },

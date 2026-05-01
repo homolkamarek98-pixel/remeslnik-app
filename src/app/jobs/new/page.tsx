@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { PlusIcon, TrashIcon } from "lucide-react";
 
@@ -17,7 +17,7 @@ interface Item {
   vatRate: number;
 }
 
-export default function NewJobPage() {
+function NewJobForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const preselectedCustomer = searchParams.get("customerId");
@@ -228,5 +228,13 @@ export default function NewJobPage() {
         </button>
       </form>
     </div>
+  );
+}
+
+export default function NewJobPage() {
+  return (
+    <Suspense>
+      <NewJobForm />
+    </Suspense>
   );
 }

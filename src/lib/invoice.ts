@@ -54,13 +54,13 @@ export function buildInvoiceData(
 
   const invoiceItems = items.map((item) => {
     const quantity = Number(item.quantity);
-    const totalExclVat = Math.round(quantity * item.unitPrice);
+    const totalExclVat = Math.round(quantity * Number(item.unitPrice));
     const vatAmount = calcVat(totalExclVat, item.vatRate);
     return {
       description: item.description,
       quantity,
       unit: item.unit,
-      unitPrice: item.unitPrice,
+      unitPrice: Number(item.unitPrice),
       vatRate: item.vatRate,
       totalExclVat,
       vatAmount,
