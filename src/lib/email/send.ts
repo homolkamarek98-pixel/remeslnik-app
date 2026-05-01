@@ -1,8 +1,11 @@
 import { Resend } from "resend";
 import { invoiceEmailHtml, overdueReminderHtml } from "./templates";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
 const FROM = "Řemeslník.app <faktury@remeslnik.app>";
+
+function getResend() {
+  return new Resend(process.env.RESEND_API_KEY!);
+}
 
 export async function sendInvoiceEmail({
   to,
@@ -19,7 +22,7 @@ export async function sendInvoiceEmail({
   dueDate: Date;
   pdfUrl?: string;
 }): Promise<void> {
-  await resend.emails.send({
+  await getResend().emails.send({
     from: FROM,
     to,
     subject: `Faktura ${invoiceNumber}`,
@@ -42,7 +45,7 @@ export async function sendOverdueReminderEmail({
   dueDate: Date;
   pdfUrl?: string;
 }): Promise<void> {
-  await resend.emails.send({
+  await getResend().emails.send({
     from: FROM,
     to,
     subject: `Upomínka — faktura ${invoiceNumber} po splatnosti`,
