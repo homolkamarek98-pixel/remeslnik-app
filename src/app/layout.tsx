@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, Space_Grotesk } from "next/font/google";
+import { Suspense } from "react";
+import { FacebookPixel } from "@/components/FacebookPixel";
 import "./globals.css";
 
 const inter = Inter({
@@ -31,7 +33,12 @@ export default function RootLayout({
       lang="cs"
       className={`${inter.variable} ${spaceGrotesk.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+        <Suspense fallback={null}>
+          <FacebookPixel />
+        </Suspense>
+        {children}
+      </body>
     </html>
   );
 }

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { CheckCircle } from "lucide-react";
+import { LeadEvent } from "@/components/LeadEvent";
 
 export const metadata: Metadata = {
   title: "Poptávka odeslána — Řemeslník.app",
@@ -16,6 +17,7 @@ export default async function OdeslanPage({ searchParams }: Props) {
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center px-4 py-16">
+      <LeadEvent />
       <div className="max-w-md w-full bg-white rounded-2xl shadow-sm border border-gray-100 p-8 text-center">
         <div className="flex justify-center mb-5">
           <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center">
