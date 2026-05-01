@@ -5,7 +5,16 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-  /* Marketplace — navy + amber palette */
+  /* Brand — Řemeslník.app (EAS-40 v1.1) */
+  --color-midnight: #1E2D40;
+  --color-amber: #E07B39;
+  --color-amber-dark: #A85520;
+  --color-amber-hover: #C96A2A;
+  --color-linen: #F6F2EC;
+  --color-ink: #111827;
+  --color-stone: #6B7280;
+
+  /* Legacy navy aliases — remove after full migration */
   --color-navy-900: #0F2744;
   --color-navy-700: #1D3D6E;
   --color-navy-500: #2E5FA3;
@@ -19,7 +28,7 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-inter);
   --font-mono: var(--font-geist-mono);
-  --font-heading: var(--font-inter);
+  --font-heading: var(--font-space-grotesk);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -192,5 +201,35 @@
   }
   html {
     @apply font-sans;
+  }
+}
+
+@layer components {
+  .btn-amber {
+    background-color: #E07B39;
+    color: #FFFFFF;
+    transition: background-color 150ms ease;
+  }
+  .btn-amber:hover {
+    background-color: #C96A2A;
+  }
+  .btn-midnight-outline {
+    color: #1E2D40;
+    border: 2px solid #1E2D40;
+    transition: all 150ms ease;
+  }
+  .btn-midnight-outline:hover {
+    background-color: #1E2D40;
+    color: #FFFFFF;
+  }
+  .category-card {
+    transition: border-color 150ms ease, background-color 150ms ease;
+  }
+  .category-card:hover {
+    border-color: #E07B39;
+    background-color: #FDF6F0;
+  }
+  .category-card:hover .category-icon {
+    color: #E07B39;
   }
 }

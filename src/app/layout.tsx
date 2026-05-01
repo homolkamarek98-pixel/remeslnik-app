@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
-import { Geist_Mono } from "next/font/google";
+import { Inter, Space_Grotesk } from "next/font/google";
 import "./globals.css";
 
 const inter = Inter({
@@ -9,15 +8,17 @@ const inter = Inter({
   display: "swap",
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const spaceGrotesk = Space_Grotesk({
+  variable: "--font-space-grotesk",
   subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
-  title: "Řemeslník.app — Zakázky a faktury pro řemeslníky",
+  title: "Řemeslník.app — Prověření řemeslníci v Praze do 24 hodin",
   description:
-    "Správa zakázek, zákazníků a faktur pro české OSVČ řemeslníky. Od zakázky po fakturu za pár minut.",
+    "Hledáte elektrikáře, instalatéra nebo malíře v Praze? Poptejte zdarma a bez závazků. Doporučíme prověřeného odborníka do 24 hodin.",
 };
 
 export default function RootLayout({
@@ -28,7 +29,7 @@ export default function RootLayout({
   return (
     <html
       lang="cs"
-      className={`${inter.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${inter.variable} ${spaceGrotesk.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">{children}</body>
     </html>
