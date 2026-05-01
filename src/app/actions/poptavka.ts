@@ -1,6 +1,7 @@
 "use server";
 
 import { z } from "zod";
+import { Resend } from "resend";
 
 const PoptavkaSchema = z.object({
   typPrace: z.string().min(1, "Vyberte typ práce"),
@@ -23,6 +24,101 @@ export type PoptavkaResult =
   | { success: true }
   | { success: false; errors: Partial<Record<keyof PoptavkaData, string>>; message?: string };
 
+function buildEmailHtml(d: PoptavkaData): string {
+  const ts = new Date().toLocaleString("cs-CZ", { timeZone: "Europe/Prague" });
+  return `<!DOCTYPE html>
+<html lang="cs">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;padding:0;background:#F6F2EC;font-family:Arial,sans-serif">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#F6F2EC;padding:32px 16px">
+    <tr><td align="center">
+      <table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.08)">
+        <!-- Header -->
+        <tr>
+          <td style="background:#1E2D40;padding:24px 32px">
+            <p style="margin:0;font-size:20px;font-weight:700;color:#ffffff">
+              Řemeslník<span style="color:#E07B39">●</span>app
+            </p>
+            <p style="margin:6px 0 0;font-size:14px;color:#9CA3AF">Nová poptávka od zákazníka</p>
+          </td>
+        </tr>
+        <!-- Body -->
+        <tr>
+          <td style="padding:32px">
+            <h1 style="margin:0 0 24px;font-size:22px;color:#1E2D40;font-weight:700">
+              📋 ${d.typPrace}
+            </h1>
+
+            <!-- Fields -->
+            <table width="100%" cellpadding="0" cellspacing="0">
+              <tr>
+                <td style="padding:12px 0;border-bottom:1px solid #F3F4F6">
+                  <p style="margin:0 0 2px;font-size:11px;text-transform:uppercase;letter-spacing:0.08em;color:#9CA3AF;font-weight:600">Obor</p>
+                  <p style="margin:0;font-size:15px;color:#111827;font-weight:600">${escHtml(d.typPrace)}</p>
+                </td>
+              </tr>
+              <tr>
+                <td style="padding:12px 0;border-bottom:1px solid #F3F4F6">
+                  <p style="margin:0 0 2px;font-size:11px;text-transform:uppercase;letter-spacing:0.08em;color:#9CA3AF;font-weight:600">Lokalita</p>
+                  <p style="margin:0;font-size:15px;color:#111827">${escHtml(d.mestskaCast)}</p>
+                </td>
+              </tr>
+              <tr>
+                <td style="padding:12px 0;border-bottom:1px solid #F3F4F6">
+                  <p style="margin:0 0 6px;font-size:11px;text-transform:uppercase;letter-spacing:0.08em;color:#9CA3AF;font-weight:600">Popis práce</p>
+                  <p style="margin:0;font-size:15px;color:#111827;white-space:pre-wrap;line-height:1.6">${escHtml(d.popis)}</p>
+                </td>
+              </tr>
+              <tr>
+                <td style="padding:12px 0;border-bottom:1px solid #F3F4F6">
+                  <p style="margin:0 0 2px;font-size:11px;text-transform:uppercase;letter-spacing:0.08em;color:#9CA3AF;font-weight:600">Jméno</p>
+                  <p style="margin:0;font-size:15px;color:#111827">${escHtml(d.jmeno)}</p>
+                </td>
+              </tr>
+              <tr>
+                <td style="padding:12px 0;border-bottom:1px solid #F3F4F6">
+                  <p style="margin:0 0 2px;font-size:11px;text-transform:uppercase;letter-spacing:0.08em;color:#9CA3AF;font-weight:600">Telefon</p>
+                  <p style="margin:0;font-size:16px;color:#1E2D40;font-weight:700">
+                    <a href="tel:${escHtml(d.telefon.replace(/\s/g, ""))}" style="color:#E07B39;text-decoration:none">${escHtml(d.telefon)}</a>
+                  </p>
+                </td>
+              </tr>
+              <tr>
+                <td style="padding:12px 0">
+                  <p style="margin:0 0 2px;font-size:11px;text-transform:uppercase;letter-spacing:0.08em;color:#9CA3AF;font-weight:600">E-mail zákazníka</p>
+                  <p style="margin:0;font-size:15px;color:#111827">
+                    <a href="mailto:${escHtml(d.email)}" style="color:#E07B39;text-decoration:none">${escHtml(d.email)}</a>
+                  </p>
+                </td>
+              </tr>
+            </table>
+
+            <!-- CTA -->
+            <div style="margin-top:28px;padding:20px;background:#FEF3C7;border-radius:8px;border-left:4px solid #E07B39">
+              <p style="margin:0;font-size:14px;color:#92400E;font-weight:600">⚡ Akce do 24 hodin</p>
+              <p style="margin:6px 0 0;font-size:14px;color:#92400E">Kontaktujte zákazníka telefonicky nebo e-mailem a potvrďte poptávku.</p>
+            </div>
+          </td>
+        </tr>
+        <!-- Footer -->
+        <tr>
+          <td style="background:#F9FAFB;padding:16px 32px;border-top:1px solid #F3F4F6">
+            <p style="margin:0;font-size:12px;color:#9CA3AF;text-align:center">
+              Přijato: ${ts} · <a href="https://remeslnik.app" style="color:#9CA3AF">remeslnik.app</a>
+            </p>
+          </td>
+        </tr>
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>`;
+}
+
+function escHtml(s: string): string {
+  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
+
 export async function submitPoptavka(
   data: PoptavkaData
 ): Promise<PoptavkaResult> {
@@ -37,36 +133,30 @@ export async function submitPoptavka(
     return { success: false, errors };
   }
 
-  const formspreeUrl = process.env.FORMSPREE_URL;
+  const d = parsed.data;
+  const resendKey = process.env.RESEND_API_KEY;
+  const operatorEmail = process.env.OPERATOR_EMAIL ?? "homolkamarek98@gmail.com";
 
-  if (formspreeUrl) {
-    const res = await fetch(formspreeUrl, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
-      body: JSON.stringify({
-        "Typ práce": parsed.data.typPrace,
-        Lokalita: parsed.data.mestskaCast,
-        Popis: parsed.data.popis,
-        Jméno: parsed.data.jmeno,
-        Telefon: parsed.data.telefon,
-        Email: parsed.data.email,
-      }),
+  if (resendKey) {
+    const resend = new Resend(resendKey);
+    const { error } = await resend.emails.send({
+      from: "Řemeslník.app <noreply@remeslnik.app>",
+      to: operatorEmail,
+      replyTo: d.email,
+      subject: `Nová poptávka: ${d.typPrace} — ${d.mestskaCast.split("—")[0].trim()}`,
+      html: buildEmailHtml(d),
     });
 
-    if (!res.ok) {
+    if (error) {
+      console.error("[poptavka] Resend error:", error);
       return {
         success: false,
         errors: {},
-        message:
-          "Nepodařilo se odeslat. Zkuste to prosím znovu, nebo nás zavolejte.",
+        message: "Nepodařilo se odeslat. Zkuste to prosím znovu, nebo nás zavolejte.",
       };
     }
   } else {
-    // Dev fallback — log to console
-    console.log("[poptavka] submission (FORMSPREE_URL not configured):", parsed.data);
+    console.log("[poptavka] RESEND_API_KEY not set — submission logged only:", d);
   }
 
   return { success: true };
