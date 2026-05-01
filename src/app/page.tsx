@@ -339,6 +339,17 @@ export default function LandingPage() {
                 </ul>
               </div>
               <div>
+                <p className="text-sm font-semibold mb-3 uppercase tracking-wider" style={{ color: "#D1D5DB" }}>Řemeslníci v Praze</p>
+                <ul className="space-y-2 text-sm" style={{ color: "#6B7280" }}>
+                  <li><Link href="/instalater-praha" className="hover:text-white transition-colors">Instalatér Praha</Link></li>
+                  <li><Link href="/elektrikar-praha" className="hover:text-white transition-colors">Elektrikář Praha</Link></li>
+                  <li><Link href="/malar-pokoju-praha" className="hover:text-white transition-colors">Malíř pokojů Praha</Link></li>
+                  <li><Link href="/zednik-praha" className="hover:text-white transition-colors">Zedník Praha</Link></li>
+                  <li><Link href="/rekonstrukce-bytu-praha" className="hover:text-white transition-colors">Rekonstrukce bytu Praha</Link></li>
+                  <li><Link href="/remeslnik-praha" className="hover:text-white transition-colors">Řemeslník Praha</Link></li>
+                </ul>
+              </div>
+              <div>
                 <p className="text-sm font-semibold mb-3 uppercase tracking-wider" style={{ color: "#D1D5DB" }}>Kontakt</p>
                 <ul className="space-y-2 text-sm" style={{ color: "#6B7280" }}>
                   <li>📧 info@remeslnik.app</li>
