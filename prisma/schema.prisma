@@ -186,3 +186,26 @@ model InvoiceItem {
   vatAmount    Int
   totalInclVat Int
 }
+
+model Poptavka {
+  id          String   @id @default(cuid())
+  typPrace    String
+  mestskaCast String
+  popis       String
+  jmeno       String
+  telefon     String
+  email       String
+  createdAt   DateTime @default(now())
+}
+
+model RemeslnikPrihlaska {
+  id          String   @id @default(cuid())
+  obor        String
+  rokZalozeni String
+  lokality    String
+  jmeno       String
+  telefon     String
+  email       String
+  cenikInfo   String?
+  createdAt   DateTime @default(now())
+}

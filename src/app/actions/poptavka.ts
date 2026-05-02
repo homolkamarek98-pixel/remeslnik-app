@@ -2,6 +2,7 @@
 
 import { z } from "zod";
 import { Resend } from "resend";
+import { prisma } from "@/lib/prisma";
 
 const PoptavkaSchema = z.object({
   typPrace: z.string().min(1, "Vyberte typ práce"),
@@ -134,29 +135,37 @@ export async function submitPoptavka(
   }
 
   const d = parsed.data;
+
+  // Always persist to database first
+  await prisma.poptavka.create({
+    data: {
+      typPrace: d.typPrace,
+      mestskaCast: d.mestskaCast,
+      popis: d.popis,
+      jmeno: d.jmeno,
+      telefon: d.telefon,
+      email: d.email,
+    },
+  });
+
+  // Send email notification via Resend (non-fatal)
   const resendKey = process.env.RESEND_API_KEY;
   const operatorEmail = process.env.OPERATOR_EMAIL ?? "homolkamarek98@gmail.com";
 
   if (resendKey) {
-    const resend = new Resend(resendKey);
-    const { error } = await resend.emails.send({
-      from: "Řemeslník.app <noreply@remeslnik.app>",
-      to: operatorEmail,
-      replyTo: d.email,
-      subject: `Nová poptávka: ${d.typPrace} — ${d.mestskaCast.split("—")[0].trim()}`,
-      html: buildEmailHtml(d),
-    });
-
-    if (error) {
-      console.error("[poptavka] Resend error:", error);
-      return {
-        success: false,
-        errors: {},
-        message: "Nepodařilo se odeslat. Zkuste to prosím znovu, nebo nás zavolejte.",
-      };
+    try {
+      const resend = new Resend(resendKey);
+      await resend.emails.send({
+        from: "Řemeslník.app <onboarding@resend.dev>",
+        to: operatorEmail,
+        replyTo: d.email,
+        subject: `Nová poptávka: ${d.typPrace} — ${d.mestskaCast.split("—")[0].trim()}`,
+        html: buildEmailHtml(d),
+      });
+    } catch (err) {
+      // Email failure is non-fatal — submission already persisted to DB
+      console.error("[poptavka] Resend error:", err);
     }
-  } else {
-    console.log("[poptavka] RESEND_API_KEY not set — submission logged only:", d);
   }
 
   return { success: true };

@@ -1,6 +1,8 @@
 "use server";
 
 import { z } from "zod";
+import { Resend } from "resend";
+import { prisma } from "@/lib/prisma";
 
 const RemeslnikSchema = z.object({
   obor: z.string().min(1, "Vyberte svůj obor"),
@@ -24,6 +26,76 @@ export type RemeslnikResult =
   | { success: true }
   | { success: false; errors: Partial<Record<keyof RemeslnikData, string>>; message?: string };
 
+function buildEmailHtml(d: RemeslnikData): string {
+  const ts = new Date().toLocaleString("cs-CZ", { timeZone: "Europe/Prague" });
+  const esc = (s: string) =>
+    s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+  return `<!DOCTYPE html>
+<html lang="cs">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;padding:0;background:#F6F2EC;font-family:Arial,sans-serif">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#F6F2EC;padding:32px 16px">
+    <tr><td align="center">
+      <table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.08)">
+        <tr>
+          <td style="background:#1E2D40;padding:24px 32px">
+            <p style="margin:0;font-size:20px;font-weight:700;color:#ffffff">Řemeslník<span style="color:#E07B39">●</span>app</p>
+            <p style="margin:6px 0 0;font-size:14px;color:#9CA3AF">Nový řemeslník — přihláška</p>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding:32px">
+            <h1 style="margin:0 0 24px;font-size:22px;color:#1E2D40;font-weight:700">🔨 ${esc(d.obor)}</h1>
+            <table width="100%" cellpadding="0" cellspacing="0">
+              <tr><td style="padding:12px 0;border-bottom:1px solid #F3F4F6">
+                <p style="margin:0 0 2px;font-size:11px;text-transform:uppercase;letter-spacing:0.08em;color:#9CA3AF;font-weight:600">Obor</p>
+                <p style="margin:0;font-size:15px;color:#111827;font-weight:600">${esc(d.obor)}</p>
+              </td></tr>
+              <tr><td style="padding:12px 0;border-bottom:1px solid #F3F4F6">
+                <p style="margin:0 0 2px;font-size:11px;text-transform:uppercase;letter-spacing:0.08em;color:#9CA3AF;font-weight:600">Zkušenosti</p>
+                <p style="margin:0;font-size:15px;color:#111827">${esc(d.rokZalozeni)}</p>
+              </td></tr>
+              <tr><td style="padding:12px 0;border-bottom:1px solid #F3F4F6">
+                <p style="margin:0 0 2px;font-size:11px;text-transform:uppercase;letter-spacing:0.08em;color:#9CA3AF;font-weight:600">Lokality</p>
+                <p style="margin:0;font-size:15px;color:#111827">${esc(d.lokality)}</p>
+              </td></tr>
+              <tr><td style="padding:12px 0;border-bottom:1px solid #F3F4F6">
+                <p style="margin:0 0 2px;font-size:11px;text-transform:uppercase;letter-spacing:0.08em;color:#9CA3AF;font-weight:600">Jméno</p>
+                <p style="margin:0;font-size:15px;color:#111827">${esc(d.jmeno)}</p>
+              </td></tr>
+              <tr><td style="padding:12px 0;border-bottom:1px solid #F3F4F6">
+                <p style="margin:0 0 2px;font-size:11px;text-transform:uppercase;letter-spacing:0.08em;color:#9CA3AF;font-weight:600">Telefon</p>
+                <p style="margin:0;font-size:16px;color:#1E2D40;font-weight:700">
+                  <a href="tel:${esc(d.telefon.replace(/\s/g, ""))}" style="color:#E07B39;text-decoration:none">${esc(d.telefon)}</a>
+                </p>
+              </td></tr>
+              <tr><td style="padding:12px 0${d.cenikInfo ? ";border-bottom:1px solid #F3F4F6" : ""}">
+                <p style="margin:0 0 2px;font-size:11px;text-transform:uppercase;letter-spacing:0.08em;color:#9CA3AF;font-weight:600">E-mail</p>
+                <p style="margin:0;font-size:15px;color:#111827">
+                  <a href="mailto:${esc(d.email)}" style="color:#E07B39;text-decoration:none">${esc(d.email)}</a>
+                </p>
+              </td></tr>
+              ${d.cenikInfo ? `<tr><td style="padding:12px 0">
+                <p style="margin:0 0 2px;font-size:11px;text-transform:uppercase;letter-spacing:0.08em;color:#9CA3AF;font-weight:600">Orientační ceník</p>
+                <p style="margin:0;font-size:15px;color:#111827;white-space:pre-wrap">${esc(d.cenikInfo)}</p>
+              </td></tr>` : ""}
+            </table>
+          </td>
+        </tr>
+        <tr>
+          <td style="background:#F9FAFB;padding:16px 32px;border-top:1px solid #F3F4F6">
+            <p style="margin:0;font-size:12px;color:#9CA3AF;text-align:center">
+              Přijato: ${ts} · <a href="https://remeslnik.app" style="color:#9CA3AF">remeslnik.app</a>
+            </p>
+          </td>
+        </tr>
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>`;
+}
+
 export async function submitRemeslnik(
   data: RemeslnikData
 ): Promise<RemeslnikResult> {
@@ -38,35 +110,39 @@ export async function submitRemeslnik(
     return { success: false, errors };
   }
 
-  const formspreeUrl = process.env.FORMSPREE_SUPPLY_URL;
+  const d = parsed.data;
 
-  if (formspreeUrl) {
-    const res = await fetch(formspreeUrl, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
-      body: JSON.stringify({
-        Obor: parsed.data.obor,
-        "Roky zkušeností": parsed.data.rokZalozeni,
-        Lokality: parsed.data.lokality,
-        Jméno: parsed.data.jmeno,
-        Telefon: parsed.data.telefon,
-        Email: parsed.data.email,
-        "Orientační ceník": parsed.data.cenikInfo ?? "",
-      }),
-    });
+  // Always persist to database first
+  await prisma.remeslnikPrihlaska.create({
+    data: {
+      obor: d.obor,
+      rokZalozeni: d.rokZalozeni,
+      lokality: d.lokality,
+      jmeno: d.jmeno,
+      telefon: d.telefon,
+      email: d.email,
+      cenikInfo: d.cenikInfo ?? null,
+    },
+  });
 
-    if (!res.ok) {
-      return {
-        success: false,
-        errors: {},
-        message: "Nepodařilo se odeslat přihlášku. Zkuste to prosím znovu.",
-      };
+  // Send email notification via Resend (non-fatal)
+  const resendKey = process.env.RESEND_API_KEY;
+  const operatorEmail = process.env.OPERATOR_EMAIL ?? "homolkamarek98@gmail.com";
+
+  if (resendKey) {
+    try {
+      const resend = new Resend(resendKey);
+      await resend.emails.send({
+        from: "Řemeslník.app <onboarding@resend.dev>",
+        to: operatorEmail,
+        replyTo: d.email,
+        subject: `Nový řemeslník: ${d.obor} — ${d.jmeno}`,
+        html: buildEmailHtml(d),
+      });
+    } catch (err) {
+      // Email failure is non-fatal — submission already persisted to DB
+      console.error("[remeslnik] Resend error:", err);
     }
-  } else {
-    console.log("[remeslnik] submission (FORMSPREE_SUPPLY_URL not configured):", parsed.data);
   }
 
   return { success: true };
