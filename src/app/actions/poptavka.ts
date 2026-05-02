@@ -168,5 +168,26 @@ export async function submitPoptavka(
     }
   }
 
+  // Forward to Formspree for additional notification (non-fatal)
+  const formspreeUrl = process.env.FORMSPREE_URL;
+  if (formspreeUrl) {
+    try {
+      await fetch(formspreeUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Accept: "application/json" },
+        body: JSON.stringify({
+          "Typ práce": d.typPrace,
+          "Lokalita": d.mestskaCast,
+          "Popis": d.popis,
+          "Jméno": d.jmeno,
+          "Telefon": d.telefon,
+          "E-mail": d.email,
+        }),
+      });
+    } catch (err) {
+      console.error("[poptavka] Formspree error:", err);
+    }
+  }
+
   return { success: true };
 }

@@ -145,5 +145,27 @@ export async function submitRemeslnik(
     }
   }
 
+  // Forward to Formspree for additional notification (non-fatal)
+  const formspreeSupplyUrl = process.env.FORMSPREE_SUPPLY_URL;
+  if (formspreeSupplyUrl) {
+    try {
+      await fetch(formspreeSupplyUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Accept: "application/json" },
+        body: JSON.stringify({
+          "Obor": d.obor,
+          "Zkušenosti": d.rokZalozeni,
+          "Lokality": d.lokality,
+          "Jméno": d.jmeno,
+          "Telefon": d.telefon,
+          "E-mail": d.email,
+          ...(d.cenikInfo ? { "Orientační ceník": d.cenikInfo } : {}),
+        }),
+      });
+    } catch (err) {
+      console.error("[remeslnik] Formspree error:", err);
+    }
+  }
+
   return { success: true };
 }
